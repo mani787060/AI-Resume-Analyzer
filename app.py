@@ -21,13 +21,37 @@
 
 # 4. CONTINUE WITH THE FOLLOWING CODE...
 
+import sys
+import os
+
 import streamlit as st
 import pandas as pd
 import base64,random
 import time,datetime
 import yt_dlp
 #libraries to parse the resume pdf files
-from pyresparser import ResumeParser
+#from pyresparser import ResumeParser
+
+# --- THE FIX: Path and Local Imports ---
+current_dir = os.path.dirname(os.path.abspath(__file__))
+if current_dir not in sys.path:
+    sys.path.insert(0, current_dir)
+
+# Import local files safely
+try:
+    from parser_utility import ResumeParser
+except ImportError:
+    st.error("Missing 'parser_utility.py' file in the directory!")
+    st.stop()
+
+try:
+    from Courses import ds_course, web_course, android_course, ios_course, uiux_course, resume_videos, interview_videos
+except ImportError:
+    st.error("Missing 'Courses.py' file in the directory!")
+    st.stop()
+# ---------------------------------------
+
+
 from pdfminer3.layout import LAParams, LTTextBox
 from pdfminer3.pdfpage import PDFPage
 from pdfminer3.pdfinterp import PDFResourceManager
@@ -41,7 +65,22 @@ from Courses import ds_course,web_course,android_course,ios_course,uiux_course,r
 # import pafy #for uploading youtube videos
 import plotly.express as px #to create visualisations at the admin session
 import nltk
+import ssl
+
+# This fixes "SSL: CERTIFICATE_VERIFY_FAILED" errors on the web
+try:
+    _create_unverified_https_context = ssl._create_unverified_context
+except AttributeError:
+    pass
+else:
+    ssl._create_default_https_context = _create_unverified_https_context
+
+# Required for pyresparser
 nltk.download('stopwords')
+nltk.download('punkt')
+nltk.download('averaged_perceptron_tagger')
+nltk.download('maxent_ne_chunker')
+nltk.download('words')
 
 
 def fetch_yt_video(link):
@@ -233,12 +272,25 @@ def run():
 
 
 
-                # st.subheader("**Skills Recommendation💡**")
-                ## Skill shows
-                keywords = st_tags(label='### Your Current Skills',
-                text='See our skills recommendation below',
-                    value=resume_data['skills'],key = '1  ')
+                
+                # Check if resume_data exists and has a 'skills' key
+                if resume_data and 'skills' in resume_data:
+                    # Ensure it's a list (st_tags requires a list for the 'value' parameter)
+                    extracted_skills = resume_data.get('skills', [])
 
+                    # st.subheader("**Skills Recommendation💡**")
+                    ## Skill shows
+                    keywords = st_tags(
+                        label='### Your Current Skills',
+                        text='See our skills recommendation below',
+                        value=extracted_skills, 
+                        key='1' # Removed the spaces in the key for stability
+                    )
+
+                else:
+                    st.error("Could not extract skills. Please check your resume format.")    
+
+ 
                 ##  keywords
                 ds_keyword = ['tensorflow','keras','pytorch','machine learning','deep Learning','flask','streamlit']
                 web_keyword = ['react', 'django', 'node jS', 'react js', 'php', 'laravel', 'magento', 'wordpress',
