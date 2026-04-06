@@ -7,6 +7,6 @@ pymysql
 plotly
 nltk
 streamlit-tags
-spacy>=3.0.0,<4.0.0
+spacy>=3.0.0
 https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.7.1/en_core_web_sm-3.7.1.tar.gz
 pyresparser
