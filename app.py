@@ -52,11 +52,11 @@ except ImportError:
 # ---------------------------------------
 
 
-from pdfminer3.layout import LAParams, LTTextBox
-from pdfminer3.pdfpage import PDFPage
-from pdfminer3.pdfinterp import PDFResourceManager
-from pdfminer3.pdfinterp import PDFPageInterpreter
-from pdfminer3.converter import TextConverter
+#from pdfminer3.layout import LAParams, LTTextBox
+#from pdfminer3.pdfpage import PDFPage
+#from pdfminer3.pdfinterp import PDFResourceManager
+#from pdfminer3.pdfinterp import PDFPageInterpreter
+#from pdfminer3.converter import TextConverter
 import io,random
 from streamlit_tags import st_tags
 from PIL import Image
@@ -103,23 +103,18 @@ def get_table_download_link(df,filename,text):
     href = f'<a href="data:file/csv;base64,{b64}" download="{filename}">{text}</a>'
     return href
 
-def pdf_reader(file):
-    resource_manager = PDFResourceManager()
-    fake_file_handle = io.StringIO()
-    converter = TextConverter(resource_manager, fake_file_handle, laparams=LAParams())
-    page_interpreter = PDFPageInterpreter(resource_manager, converter)
-    with open(file, 'rb') as fh:
-        for page in PDFPage.get_pages(fh,
-                                      caching=True,
-                                      check_extractable=True):
-            page_interpreter.process_page(page)
-            print(page)
-        text = fake_file_handle.getvalue()
+from pdfminer.high_level import extract_text
 
-    # close open handles
-    converter.close()
-    fake_file_handle.close()
-    return text
+def pdf_reader(file):
+    try:
+        # This function internally handles the ResourceManager, 
+        # Converter, and Interpreter that your long code used manually.
+        text = extract_text(file)
+        return text
+    except Exception as e:
+        # This catches errors if the PDF is password protected or corrupted
+        st.error(f"Error reading PDF: {e}")
+        return ""
 
 def show_pdf(file_path):
     with open(file_path, "rb") as f:
