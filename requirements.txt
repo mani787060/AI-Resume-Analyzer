@@ -1,7 +1,7 @@
 streamlit
 pandas
 yt-dlp
-pdfminer3
+pdfminer.six
 pillow
 pymysql
 plotly
