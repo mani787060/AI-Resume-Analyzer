@@ -141,9 +141,9 @@ def course_recommender(course_list):
 
 #CONNECT TO DATABASE
 
-# Replace your connection line with this "Smart" version
+# --- DATABASE CONNECTION FIX ---
 try:
-    # This tries to find the secrets (for the Web/Cloud)
+    # 1. Try connecting using Streamlit Cloud Secrets
     connection = pymysql.connect(
         host=st.secrets["db_host"],
         user=st.secrets["db_user"],
@@ -151,15 +151,26 @@ try:
         database=st.secrets["db_database"],
         autocommit=True
     )
-except:
-    # If secrets aren't found, it falls back to your local XAMPP (for your laptop)
-    connection = pymysql.connect(
-        host='localhost',
-        user='root',
-        password='',
-        database='cv',
-        autocommit=True
-    )
+except Exception as e:
+    # 2. Check if we are running locally or on the web
+    if "db_host" not in st.secrets:
+        try:
+            # Fallback for your Laptop/Localhost only
+            connection = pymysql.connect(
+                host='localhost',
+                user='root',
+                password='',
+                database='cv',
+                autocommit=True
+            )
+        except Exception as local_e:
+            st.error("Database Connection Failed! Please check your local XAMPP or Cloud Secrets.")
+            st.stop()
+    else:
+        # If secrets ARE there but connection failed, show the specific error
+        st.error(f"Cloud Database Connection Error: {e}")
+        st.stop()
+
 cursor = connection.cursor()
 
 
