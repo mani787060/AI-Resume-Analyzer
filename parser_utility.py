@@ -7,13 +7,24 @@ from spacy.matcher import Matcher
 
 class ResumeParser:
     def __init__(self, resume_path):
-        # Safely download and load the model directly into spaCy's memory space
+        # Defend against permission issues by targeting a local directory
+        model_name = 'en_core_web_sm'
         try:
-            self.__nlp = spacy.load('en_core_web_sm')
+            self.__nlp = spacy.load(model_name)
         except OSError:
+            import os
             from spacy.cli import download
-            download('en_core_web_sm')
-            self.__nlp = spacy.load('en_core_web_sm')
+            
+            # 1. Download the model files without linking them to the restricted global path
+            download(model_name, False, False, "--target=.")
+            
+            # 2. Point spaCy directly to the folder that was just created locally
+            model_path = os.path.abspath(os.path.join(".", model_name, model_name + "-3.7.1"))
+            if not os.path.exists(model_path):
+                # Fallback check if folder structure differs slightly
+                model_path = os.path.abspath(os.path.join(".", model_name))
+                
+            self.__nlp = spacy.load(model_path)
             
         self.__matcher = Matcher(self.__nlp.vocab)
         self.__resume_path = resume_path
