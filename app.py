@@ -124,23 +124,8 @@ def show_pdf(file_path):
     with open(file_path, "rb") as f:
         base64_pdf = base64.b64encode(f.read()).decode('utf-8')
     
-    # 2. Construct a secure HTML object component that Chrome approves
-    pdf_display = f'''
-        <object 
-            data="data:application/pdf;base64,{base64_pdf}" 
-            type="application/pdf" 
-            width="100%" 
-            height="1000px"
-            style="border: none; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);"
-        >
-            <div style="padding: 20px; background-color: #ffebe9; border: 1px solid #ffc1bd; border-radius: 8px; color: #b91c1c;">
-                <strong>⚠️ Browser View Blocked:</strong> Chrome's security settings are preventing inline preview. 
-                <a href="data:application/pdf;base64,{base64_pdf}" download="Uploaded_Resume.pdf" style="color: #b91c1c; font-weight: bold; text-decoration: underline; margin-left: 5px;">
-                    Click here to download and view the resume directly.
-                </a>
-            </div>
-        </object>
-    '''
+    # 2. Keep the HTML string entirely on one single line so Streamlit reads it as pure HTML
+    pdf_display = f'<object data="data:application/pdf;base64,{base64_pdf}" type="application/pdf" width="100%" height="1000px"></object>'
     
     # 3. Render the component smoothly on your Streamlit UI
     st.markdown(pdf_display, unsafe_allow_html=True)
