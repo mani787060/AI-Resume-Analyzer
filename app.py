@@ -116,19 +116,36 @@ def pdf_reader(file):
         st.error(f"Error reading PDF: {e}")
         return ""
 
+
 def show_pdf(file_path):
-    import base64
+    import fitz  # PyMuPDF (The correct import)
     import streamlit as st
     
-    # 1. Read the PDF file as binary data safely
-    with open(file_path, "rb") as f:
-        base64_pdf = base64.b64encode(f.read()).decode('utf-8')
-    
-    # 2. Keep the HTML string entirely on one single line so Streamlit reads it as pure HTML
-    pdf_display = f'<object data="data:application/pdf;base64,{base64_pdf}" type="application/pdf" width="100%" height="1000px"></object>'
-    
-    # 3. Render the component smoothly on your Streamlit UI
-    st.markdown(pdf_display, unsafe_allow_html=True)
+    try:
+        # 1. Open the user's uploaded PDF file natively
+        doc = fitz.open(file_path)
+        
+        # 2. Extract the first page of the PDF dynamically
+        page = doc.load_page(0)
+        
+        # 3. Convert that page into a clean, high-resolution PNG image stream
+        pix = page.get_pixmap(dpi=150)
+        img_bytes = pix.tobytes("png")
+        
+        # 4. Display it safely on the screen using Streamlit's native image element
+        st.image(img_bytes, caption="Uploaded Resume Preview", use_container_width=True)
+        
+    except Exception as e:
+        # Emergency backup link if the PDF file itself is corrupted
+        with open(file_path, "rb") as f:
+            pdf_bytes = f.read()
+        st.info("💡 PDF loaded securely. Click below to view the full file:")
+        st.download_button(
+            label="📄 View / Download Resume PDF",
+            data=pdf_bytes,
+            file_name="uploaded_resume.pdf",
+            mime="application/pdf"
+        )
 
 def course_recommender(course_list):
     st.subheader("**Courses & Certificates Recommendations 🎓**")
