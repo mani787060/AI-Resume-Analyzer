@@ -9,3 +9,4 @@ nltk
 streamlit-tags
 numpy==1.26.4
 spacy==3.7.2
+pymupdf==1.24.2
