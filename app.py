@@ -433,7 +433,7 @@ def run():
                     resume_score = resume_score + 20
                     st.markdown('''<h5 style='text-align: left; color: #1ed760;'>[+] Awesome! You have added your Projects</h5>''', unsafe_allow_html=True)
                 else:
-                    st.markdown('''<h5 style='text-align: left; color: #FFB020;'>[-] Please add Projects. It will show that you have done work related to the required position or not.</h5>''', unsafe_allow_html=True                    
+                    st.markdown('''<h5 style='text-align: left; color: #FFB020;'>[-] Please add Projects. It will show that you have done work related to the required position or not.</h5>''', unsafe_allow_html=True)                    
 
                     
                 st.subheader("**Resume Score📝**")
