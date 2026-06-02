@@ -6,31 +6,43 @@ from pdfminer.high_level import extract_text, extract_pages
 from spacy.matcher import Matcher
 
 class ResumeParser:
-    def __init__(self, resume_path):
-        # Defend against permission issues by targeting a local directory
-        model_name = 'en_core_web_sm'
-        try:
-            self.__nlp = spacy.load(model_name)
-        except OSError:
-            import os
-            from spacy.cli import download
+    # def __init__(self, resume_path):
+    #     # Defend against permission issues by targeting a local directory
+    #     model_name = 'en_core_web_sm'
+    #     try:
+    #         self.__nlp = spacy.load(model_name)
+    #     except OSError:
+    #         import os
+    #         from spacy.cli import download
             
-            # 1. Download the model files without linking them to the restricted global path
-            download(model_name, False, False, "--target=.")
+    #         # 1. Download the model files without linking them to the restricted global path
+    #         download(model_name, False, False, "--target=.")
             
-            # 2. Point spaCy directly to the folder that was just created locally
-            model_path = os.path.abspath(os.path.join(".", model_name, model_name + "-3.7.1"))
-            if not os.path.exists(model_path):
-                # Fallback check if folder structure differs slightly
-                model_path = os.path.abspath(os.path.join(".", model_name))
+    #         # 2. Point spaCy directly to the folder that was just created locally
+    #         model_path = os.path.abspath(os.path.join(".", model_name, model_name + "-3.7.1"))
+    #         if not os.path.exists(model_path):
+    #             # Fallback check if folder structure differs slightly
+    #             model_path = os.path.abspath(os.path.join(".", model_name))
                 
-            self.__nlp = spacy.load(model_path)
+    #         self.__nlp = spacy.load(model_path)
             
+    #     self.__matcher = Matcher(self.__nlp.vocab)
+    #     self.__resume_path = resume_path
+    #     self.__text = self.__extract_content(self.__resume_path)
+    #     self.__details = self.__do_parse()
+
+    
+    def __init__(self, resume_path):
+        # Clean, native spaCy loading method
+        import spacy
+        from spacy.matcher import Matcher
+        
+        self.__nlp = spacy.load('en_core_web_sm')
         self.__matcher = Matcher(self.__nlp.vocab)
         self.__resume_path = resume_path
         self.__text = self.__extract_content(self.__resume_path)
         self.__details = self.__do_parse()
-
+    
     def get_extracted_data(self):
         return self.__details
 
