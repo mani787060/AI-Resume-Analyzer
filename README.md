@@ -193,5 +193,3 @@ You can now:
 * View recruiter analytics dashboards
 * Store candidate insights in TiDB Cloud
 
-```
-```
