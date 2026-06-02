@@ -7,11 +7,14 @@ from spacy.matcher import Matcher
 
 class ResumeParser:
     def __init__(self, resume_path):
+        # This block checks if the model is installed. If not, it downloads it directly!
         try:
             self.__nlp = spacy.load('en_core_web_sm')
         except:
+            import os
+            os.system("python -m spacy download en_core_web_sm")
             import en_core_web_sm
-            self.__nlp = en_core_web_sm.load()
+            self.__nlp = en_core_web_sm.load()        
             
         self.__matcher = Matcher(self.__nlp.vocab)
         self.__resume_path = resume_path
